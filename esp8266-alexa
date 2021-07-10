@@ -1,0 +1,66 @@
+#ifdef ARDUINO_ARCH_ESP32
+#include <WiFi.h>
+#else
+#include <ESP8266WiFi.h>
+#endif
+
+#include <Espalexa.h>
+
+#define D3 2
+
+
+const char* ssid = "<<SSID>>";
+const char* password = "<<PASSwORD>>";
+
+Espalexa espAlexa;
+void Funcion_D3(uint8_t brightness);
+
+
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(D3, OUTPUT);
+
+  digitalWrite(D3, HIGH);
+
+  ConectarWifi();
+  espAlexa.addDevice("Luz", Funcion_D3);
+
+  espAlexa.begin();
+}
+
+void loop() {
+  ConectarWifi();
+  espAlexa.loop();
+  delay(1);
+}
+
+// Função para conectar com WIFI
+void ConectarWifi() {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+    Serial.println("");
+    Serial.println("Connecting to WiFi");
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+
+  //Mostramos no monitor serial o IP que o ESP possui para verificarmos se é o mesmo que configuramos
+  Serial.print("Server em: ");
+  Serial.println(WiFi.localIP());
+
+  }
+}
+
+
+// Função para o pin D3
+void Funcion_D3(uint8_t brightness) {
+  if (brightness) {
+    digitalWrite(D3, LOW);
+  }
+  else {
+    digitalWrite(D3, HIGH);
+  }
+}
